@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>BELTUR Koordinasyon</title>
+  <meta name="theme-color" content="#0f172a">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" href="simge-192.png">
+  <link rel="apple-touch-icon" href="simge-192.png">
+  <style>
+    html, body { margin: 0; height: 100%; background: #f1f5f9; font-family: Inter, "Segoe UI", system-ui, sans-serif; }
+    body { display: flex; flex-direction: column; }
+    #portal { flex: 1; width: 100%; border: 0; display: block; }
+    #kabukSerit { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; padding: 8px 16px; background: #0f172a; color: #e2e8f0; font-size: 13px; border-bottom: 1px solid #1e293b; }
+    #kabukSerit.hidden { display: none; }
+    #kabukSerit button { background: #2563eb; color: #fff; border: 0; border-radius: 8px; padding: 6px 12px; font: inherit; font-weight: 600; cursor: pointer; }
+    #kabukSerit button:hover { background: #1d4ed8; }
+    #kabukSerit button.ikincil { background: transparent; border: 1px solid #334155; }
+  </style>
+</head>
+<body>
+  <div id="kabukSerit" class="hidden" role="status" aria-live="polite"></div>
+  <iframe id="portal" title="BELTUR Koordinasyon Portalı" allow="clipboard-write"></iframe>
+
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-messaging-compat.js"></script>
+  <script src="ayarlar.js"></script>
+  <script src="uygulama.js"></script>
+</body>
+</html>
