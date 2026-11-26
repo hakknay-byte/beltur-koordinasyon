@@ -10,7 +10,8 @@
   var durum = yeniDurum();
 
   function yeniDurum() {
-    return { portalKaynak: null, portalKoken: null, token: null, bekleyenIs: null, kurulumOlayi: null, kayit: null, mesajlasma: null };
+    return { portalKaynak: null, portalKoken: null, token: null, bekleyenIs: null, kurulumOlayi: null, kayit: null, mesajlasma: null,
+      tokenIstegi: null, izinBekleniyor: false };
   }
 
   function ayar() { return g.KABUK_AYARLARI || {}; }
@@ -20,7 +21,8 @@
       sw: g.navigator.serviceWorker,
       Bildirim: g.Notification,
       firebase: g.firebase,
-      konum: g.location
+      konum: g.location,
+      izinler: g.navigator.permissions
     };
   }
 
@@ -61,10 +63,12 @@
       serit('<span>Bu tarayıcı masaüstü bildirimlerini desteklemiyor. Lütfen Chrome veya Edge kullanın.</span>');
       return;
     }
-    if (B.Bildirim.permission === 'default') {
+    if (durum.izinBekleniyor && B.Bildirim.permission === 'default') {
+      parcalar.push('<span>İzin bekleniyor: açılan pencerede "İzin ver" deyin. Pencere görünmüyorsa pencerenin sağ üstündeki zil simgesine tıklayıp "İzin ver" seçin.</span>');
+    } else if (B.Bildirim.permission === 'default') {
       parcalar.push('<span>Görev bildirimlerini almak için izin verin.</span><button id="izinVerBtn" type="button">Bildirimlere İzin Ver</button>');
     } else if (B.Bildirim.permission === 'denied') {
-      parcalar.push('<span>Bildirimler engellenmiş. Adres çubuğundaki kilit simgesinden "Bildirimler: İzin ver" seçip sayfayı yenileyin.</span>');
+      parcalar.push('<span>Bildirimler engellenmiş. Pencerenin sağ üstündeki zil (veya adres çubuğundaki kilit) simgesinden "Bildirimler: İzin ver" seçin.</span>');
     }
     if (durum.kurulumOlayi) parcalar.push('<button id="yukleBtn" type="button" class="ikincil">Uygulamayı Yükle</button>');
     serit(parcalar.join(''));
@@ -81,10 +85,31 @@
 
   function izinIste() {
     var B = bag();
+    durum.izinBekleniyor = true;
+    seritGuncelle();
     return Promise.resolve(B.Bildirim.requestPermission()).then(function (p) {
+      durum.izinBekleniyor = false;
       seritGuncelle();
       if (p === 'granted') return tokenAl();
+    }, function () {
+      durum.izinBekleniyor = false;
+      seritGuncelle();
     });
+  }
+
+  /* İzin, şerit düğmesi dışında (başlık çubuğundaki zil, site ayarları) verilirse de yakalanır. */
+  function izinDegisiminiIzle() {
+    var B = bag();
+    if (!B.izinler || !B.izinler.query) return;
+    B.izinler.query({ name: 'notifications' }).then(function (d) {
+      d.onchange = function () {
+        durum.izinBekleniyor = false;
+        seritGuncelle();
+        if (B.Bildirim.permission === 'granted' && !durum.token) {
+          tokenAl().catch(function (err) { console.error('Bildirim kaydı başarısız:', err); });
+        }
+      };
+    }).catch(function () {});
   }
 
   function onMesaj(yuk) {
@@ -100,6 +125,14 @@
   }
 
   function tokenAl() {
+    if (!durum.tokenIstegi) {
+      durum.tokenIstegi = tokenIste().then(function (x) { durum.tokenIstegi = null; return x; },
+        function (err) { durum.tokenIstegi = null; throw err; });
+    }
+    return durum.tokenIstegi;
+  }
+
+  function tokenIste() {
     var A = ayar();
     var B = bag();
     return Promise.resolve(durum.kayit || B.sw.register('firebase-messaging-sw.js')).then(function (kayit) {
@@ -154,6 +187,7 @@
     if (cerceve && cerceve.getAttribute('src') !== A.portalAdresi) cerceve.setAttribute('src', A.portalAdresi);
     if (B.sw && B.sw.addEventListener) B.sw.addEventListener('message', swMesaji);
     seritGuncelle();
+    izinDegisiminiIzle();
     if (B.Bildirim && B.Bildirim.permission === 'granted') {
       return tokenAl().catch(function (err) { console.error('Bildirim kaydı başarısız:', err); });
     }
