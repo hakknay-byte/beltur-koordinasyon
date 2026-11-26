@@ -13,8 +13,8 @@ mesajlasma.onBackgroundMessage(function (yuk) {
   var d = (yuk && yuk.data) || {};
   return self.registration.showNotification(d.baslik || 'BELTUR Koordinasyon', {
     body: d.mesaj || '',
-    icon: 'simge-192.png',
-    badge: 'simge-192.png',
+    icon: 'simge-v3-192.png',
+    badge: 'simge-v3-192.png',
     tag: d.isId || ('b' + Date.now()),
     data: { link: d.link || '', isId: d.isId || '' }
   });

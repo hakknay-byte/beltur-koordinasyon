@@ -9,8 +9,8 @@
   "background_color": "#f1f5f9",
   "theme_color": "#0f172a",
   "icons": [
-    { "src": "simge-v2-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
-    { "src": "simge-v2-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
-    { "src": "simge-v2.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" }
+    { "src": "simge-v3-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "simge-v3-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "simge-v3.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" }
   ]
 }
